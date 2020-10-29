@@ -23,6 +23,7 @@ public class CoffeeMakerTest {
         r4 = new Recipe("Mix",100,1,2,1,2);
     }
 
+    //Add
     @Test
     public void testAddOneRecipe() throws AmountOfRecipeException, DuplicatedRecipeException {
         boolean ok = CM.addRecipe(r1);
@@ -40,11 +41,77 @@ public class CoffeeMakerTest {
     }
 
     @Test
+    public void testAddMoreThanFourRecipes() throws AmountOfRecipeException, DuplicatedRecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        ok = CM.addRecipe(r2);
+        assertTrue(ok);
+        ok = CM.addRecipe(r3);
+        assertTrue(ok);
+        assertThrows(AmountOfRecipeException.class, () -> CM.addRecipe(r4));
+    }
+
+    @Test
     public void testAddTwoRecipesSameName() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException {
         boolean ok = CM.addRecipe(r1);
         assertTrue(ok);
         r2.setName(r1.getName());
         assertThrows(DuplicatedRecipeException.class, () -> CM.addRecipe(r2));
     }
+
+    @Test
+    public void testAddTwoRecipesSameIngredients() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        Recipe r = new Recipe("Coffee2",50,4,0,1,0);
+        assertThrows(DuplicatedRecipeException.class, () -> CM.addRecipe(r));
+    }
+
+    //Remove
+    @Test
+    public void testRemoveOneRecipe() throws AmountOfRecipeException, DuplicatedRecipeException, RecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        ok = CM.deleteRecipe("Coffee");
+        assertTrue(ok);
+    }
+
+    @Test
+    public void testRemoveMoreThanTwoRecipes() throws AmountOfRecipeException, DuplicatedRecipeException, RecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        ok = CM.addRecipe(r2);
+        assertTrue(ok);
+        ok = CM.deleteRecipe("Coffee");
+        assertTrue(ok);
+        ok = CM.deleteRecipe("Hot Chocolate");
+        assertTrue(ok);
+    }
+
+    @Test
+    public void testRemoveTheSameRecipeTwice() throws AmountOfRecipeException, DuplicatedRecipeException, RecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        ok = CM.deleteRecipe("Coffee");
+        assertTrue(ok);
+        assertThrows(RecipeException.class, () -> CM.deleteRecipe("Coffee"));
+    }
+
+    @Test
+    public void testRemoveRecipeThatIsNotPresentInCoffeeMaker() {
+        assertThrows(RecipeException.class, () -> CM.deleteRecipe("Coffee"));
+    }
+
+    @Test
+    public void testRemoveRecipeWithNullName() {
+        assertThrows(RecipeException.class, () -> CM.deleteRecipe(null));
+    }
+
+    @Test
+    public void testRemoveRecipeWithEmptyName() {
+        assertThrows(RecipeException.class, () -> CM.deleteRecipe(""));
+    }
+
+    //Resupply Ingredients from Coffee Maker
 
 }
