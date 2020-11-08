@@ -13,8 +13,6 @@ public class Recipe {
     private int amtSugar;
     private int amtChocolate;
     
-    
-    
     public Recipe(String name, int price, int amtCoffee, int amtMilk,
 			int amtSugar, int amtChocolate) throws InvalidValueException {
 		super();

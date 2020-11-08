@@ -67,6 +67,26 @@ public class CoffeeMakerTest {
         assertThrows(DuplicatedRecipeException.class, () -> CM.addRecipe(r));
     }
 
+    @Test
+    public void testAddRecipesPriceZero() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        InvalidValueException thrown = assertThrows(
+                InvalidValueException.class, () -> new Recipe("Coffee2",0,4,0,1,0)
+        );
+        assertEquals("Price must be a positive integer", thrown.getMessage());
+    }
+
+    @Test
+    public void testAddTwoRecipesPriceNegative() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        InvalidValueException thrown = assertThrows(
+                InvalidValueException.class, () -> new Recipe("Coffee2",-1,4,0,1,0)
+        );
+        assertEquals("Price must be a positive integer", thrown.getMessage());
+    }
+
     //Remove
     @Test
     public void testRemoveOneRecipe() throws AmountOfRecipeException, DuplicatedRecipeException, RecipeException {
