@@ -4,6 +4,8 @@ import coffeemaker.exceptions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Vector;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CoffeeMakerTest {
@@ -128,7 +130,7 @@ public class CoffeeMakerTest {
     }
 
     @Test
-    public void testRemoveRecipeWithNullName() {
+    public void testRemoveRecipeWithNull() {
         assertThrows(RecipeException.class, () -> CM.deleteRecipe(null));
     }
 
@@ -137,6 +139,240 @@ public class CoffeeMakerTest {
         assertThrows(RecipeException.class, () -> CM.deleteRecipe(""));
     }
 
+    //Get recipes
+    @Test
+    public void testGetZeroRecipes() {
+        Vector<Recipe> recipes = CM.getRecipes();
+        assertEquals(0, recipes.size());
+    }
+
+    @Test
+    public void testGetOneRecipe() throws AmountOfRecipeException, DuplicatedRecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        Vector<Recipe> recipes = CM.getRecipes();
+        assertEquals(1, recipes.size());
+    }
+
+    @Test
+    public void testGetThreeRecipes() throws AmountOfRecipeException, DuplicatedRecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        ok = CM.addRecipe(r2);
+        assertTrue(ok);
+        ok = CM.addRecipe(r3);
+        assertTrue(ok);
+        Vector<Recipe> recipes = CM.getRecipes();
+        assertEquals(3, recipes.size());
+    }
+
+    @Test
+    public void testGetThreeRecipesAfterTryingTheFourth() throws AmountOfRecipeException, DuplicatedRecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        ok = CM.addRecipe(r2);
+        assertTrue(ok);
+        ok = CM.addRecipe(r3);
+        assertTrue(ok);
+        assertThrows(AmountOfRecipeException.class, () -> CM.addRecipe(r4));
+        Vector<Recipe> recipes = CM.getRecipes();
+        assertEquals(3, recipes.size());
+    }
+
+    @Test
+    public void testGetZeroRecipesAfterRemovingOneRecipe() throws AmountOfRecipeException, DuplicatedRecipeException, RecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        Vector<Recipe> recipes = CM.getRecipes();
+        assertEquals(1, recipes.size());
+        ok = CM.deleteRecipe("Coffee");
+        assertTrue(ok);
+        recipes = CM.getRecipes();
+        assertEquals(0, recipes.size());
+    }
+
+    //Check ingredients
+    @Test
+    public void testCheckInitialCoffeeInventory() {
+        int coffeeInv = CM.checkCoffeeInventory();
+        assertEquals(20, coffeeInv);
+    }
+
+    @Test
+    public void testCheckInitialMilkInventory() {
+        int milkInv = CM.checkMilkInventory();
+        assertEquals(20, milkInv);
+    }
+
+    @Test
+    public void testCheckInitialSugarInventory() {
+        int sugarInv = CM.checkSugarInventory();
+        assertEquals(20, sugarInv);
+    }
+
+    @Test
+    public void testCheckInitialChocolateInventory() {
+        int chocolateInv = CM.checkChocolateInventory();
+        assertEquals(20, chocolateInv);
+    }
+
     //Resupply Ingredients from Coffee Maker
+    @Test
+    public void testResupplyCoffeeInventory() throws InvalidValueException {
+        int coffeeInv = CM.checkCoffeeInventory();
+        assertEquals(20, coffeeInv);
+        CM.addCoffeeInventory(50);
+        coffeeInv = CM.checkCoffeeInventory();
+        assertEquals(70, coffeeInv);
+    }
+
+    @Test
+    public void testResupplyCoffeeInventoryLimit() throws InvalidValueException {
+        int coffeeInv = CM.checkCoffeeInventory();
+        assertEquals(20, coffeeInv);
+        CM.addCoffeeInventory(80);
+        coffeeInv = CM.checkCoffeeInventory();
+        assertEquals(100, coffeeInv);
+    }
+
+    @Test
+    public void testInvalidResupplyCoffeeInventoryInsertMoreThanAllowed() {
+        int coffeeInv = CM.checkCoffeeInventory();
+        assertEquals(20, coffeeInv);
+        assertThrows(InvalidValueException.class, () -> CM.addCoffeeInventory(81));
+    }
+
+    @Test
+    public void testInvalidResupplyCoffeeInventoryInsertNegativeValue() {
+        int coffeeInv = CM.checkCoffeeInventory();
+        assertEquals(20, coffeeInv);
+        assertThrows(InvalidValueException.class, () -> CM.addCoffeeInventory(-1));
+    }
+
+    @Test
+    public void testInvalidResupplyCoffeeInventoryInsertZeroValue() {
+        int coffeeInv = CM.checkCoffeeInventory();
+        assertEquals(20, coffeeInv);
+        assertThrows(InvalidValueException.class, () -> CM.addCoffeeInventory(0));
+    }
+
+    @Test
+    public void testResupplyMilkInventory() throws InvalidValueException {
+        int milkInv = CM.checkMilkInventory();
+        assertEquals(20, milkInv);
+        CM.addMilkInventory(50);
+        milkInv = CM.checkMilkInventory();
+        assertEquals(70, milkInv);
+    }
+
+    @Test
+    public void testResupplyMilkInventoryLimit() throws InvalidValueException {
+        int milkInv = CM.checkMilkInventory();
+        assertEquals(20, milkInv);
+        CM.addMilkInventory(80);
+        milkInv = CM.checkMilkInventory();
+        assertEquals(100, milkInv);
+    }
+
+    @Test
+    public void testInvalidResupplyMilkInventoryInsertMoreThanAllowed() {
+        int milkInv = CM.checkMilkInventory();
+        assertEquals(20, milkInv);
+        assertThrows(InvalidValueException.class, () -> CM.addMilkInventory(81));
+    }
+
+    @Test
+    public void testInvalidResupplyMilkInventoryInsertNegativeValue() {
+        int milkInv = CM.checkMilkInventory();
+        assertEquals(20, milkInv);
+        assertThrows(InvalidValueException.class, () -> CM.addMilkInventory(-1));
+    }
+
+    @Test
+    public void testInvalidResupplyMilkInventoryInsertZeroValue() {
+        int milkInv = CM.checkMilkInventory();
+        assertEquals(20, milkInv);
+        assertThrows(InvalidValueException.class, () -> CM.addMilkInventory(0));
+    }
+
+    @Test
+    public void testResupplySugarInventory() throws InvalidValueException {
+        int sugarInv = CM.checkSugarInventory();
+        assertEquals(20, sugarInv);
+        CM.addSugarInventory(50);
+        sugarInv = CM.checkSugarInventory();
+        assertEquals(70, sugarInv);
+    }
+
+    @Test
+    public void testResupplySugarInventoryLimit() throws InvalidValueException {
+        int sugarInv = CM.checkSugarInventory();
+        assertEquals(20, sugarInv);
+        CM.addSugarInventory(80);
+        sugarInv = CM.checkSugarInventory();
+        assertEquals(100, sugarInv);
+    }
+
+    @Test
+    public void testInvalidResupplySugarInventoryInsertMoreThanAllowed() {
+        int sugarInv = CM.checkSugarInventory();
+        assertEquals(20, sugarInv);
+        assertThrows(InvalidValueException.class, () -> CM.addSugarInventory(81));
+    }
+
+    @Test
+    public void testInvalidResupplySugarInventoryInsertNegativeValue() {
+        int sugarInv = CM.checkSugarInventory();
+        assertEquals(20, sugarInv);
+        assertThrows(InvalidValueException.class, () -> CM.addSugarInventory(-1));
+    }
+
+    @Test
+    public void testInvalidResupplySugarInventoryInsertZeroValue() {
+        int sugarInv = CM.checkSugarInventory();
+        assertEquals(20, sugarInv);
+        assertThrows(InvalidValueException.class, () -> CM.addSugarInventory(0));
+    }
+
+    @Test
+    public void testResupplyChocolateInventory() throws InvalidValueException {
+        int chocolateInv = CM.checkChocolateInventory();
+        assertEquals(20, chocolateInv);
+        CM.addChocolateInventory(50);
+        chocolateInv = CM.checkChocolateInventory();
+        assertEquals(70, chocolateInv);
+    }
+
+    @Test
+    public void testResupplyChocolateInventoryLimit() throws InvalidValueException {
+        int chocolateInv = CM.checkChocolateInventory();
+        assertEquals(20, chocolateInv);
+        CM.addChocolateInventory(80);
+        chocolateInv = CM.checkChocolateInventory();
+        assertEquals(100, chocolateInv);
+    }
+
+    @Test
+    public void testInvalidResupplyChocolateInventoryInsertMoreThanAllowed() {
+        int chocolateInv = CM.checkChocolateInventory();
+        assertEquals(20, chocolateInv);
+        assertThrows(InvalidValueException.class, () -> CM.addChocolateInventory(81));
+    }
+
+    @Test
+    public void testInvalidResupplyChocolateInventoryInsertNegativeValue() {
+        int chocolateInv = CM.checkChocolateInventory();
+        assertEquals(20, chocolateInv);
+        assertThrows(InvalidValueException.class, () -> CM.addChocolateInventory(-1));
+    }
+
+    @Test
+    public void testInvalidResupplyChocolateInventoryInsertZeroValue() {
+        int chocolateInv = CM.checkChocolateInventory();
+        assertEquals(20, chocolateInv);
+        assertThrows(InvalidValueException.class, () -> CM.addChocolateInventory(0));
+    }
+
+    //Make recipe
 
 }
