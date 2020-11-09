@@ -25,6 +25,11 @@ public class CoffeeMakerTest {
 
     //Add
     @Test
+    public void testAddNull() {
+        assertThrows(NullPointerException.class, () -> CM.addRecipe(null));
+    }
+
+    @Test
     public void testAddOneRecipe() throws AmountOfRecipeException, DuplicatedRecipeException {
         boolean ok = CM.addRecipe(r1);
         assertTrue(ok);
@@ -68,7 +73,7 @@ public class CoffeeMakerTest {
     }
 
     @Test
-    public void testAddRecipesPriceZero() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException {
+    public void testAddRecipesPriceZero() throws AmountOfRecipeException, DuplicatedRecipeException {
         boolean ok = CM.addRecipe(r1);
         assertTrue(ok);
         InvalidValueException thrown = assertThrows(
@@ -78,7 +83,7 @@ public class CoffeeMakerTest {
     }
 
     @Test
-    public void testAddTwoRecipesPriceNegative() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException {
+    public void testAddTwoRecipesPriceNegative() throws AmountOfRecipeException, DuplicatedRecipeException {
         boolean ok = CM.addRecipe(r1);
         assertTrue(ok);
         InvalidValueException thrown = assertThrows(
