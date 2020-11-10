@@ -4,6 +4,7 @@ import coffeemaker.exceptions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.naming.InsufficientResourcesException;
 import java.util.Vector;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -374,5 +375,75 @@ public class CoffeeMakerTest {
     }
 
     //Make recipe
+    @Test
+    public void testMakeCoffeeWithOneRecipeWithInitialInventoryAndCorrectAmount() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException, InsufficientAmountOfMoneyException, InventoryException, RecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        int change = CM.makeCoffee("Coffee", 50);
+        assertEquals(0, change);
+    }
 
+    @Test
+    public void testMakeCoffeeWithOneRecipeWithInitialInventoryAndOverAmount() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException, InsufficientAmountOfMoneyException, InventoryException, RecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        int change = CM.makeCoffee("Coffee", 60);
+        assertEquals(10, change);
+    }
+
+    @Test
+    public void testMakeCoffeeWithOneRecipeWithInitialInventoryAndUnderAmount() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException, InsufficientAmountOfMoneyException, InventoryException, RecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        assertThrows(InsufficientAmountOfMoneyException.class, () -> CM.makeCoffee("Coffee", 40));
+    }
+
+    @Test
+    public void testMakeCoffeeWithOneRecipeWithInitialInventoryInsufficientIngredients() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException, InsufficientAmountOfMoneyException, InventoryException, RecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        int change = CM.makeCoffee("Coffee", 50);
+        assertEquals(0, change);
+        change = CM.makeCoffee("Coffee", 50);
+        assertEquals(0, change);
+        change = CM.makeCoffee("Coffee", 50);
+        assertEquals(0, change);
+        change = CM.makeCoffee("Coffee", 50);
+        assertEquals(0, change);
+        change = CM.makeCoffee("Coffee", 50);
+        assertEquals(0, change);
+        assertThrows(InventoryException.class, () -> CM.makeCoffee("Coffee", 50)); //cannot get change
+    }
+
+    @Test
+    public void testInvalidMakeCoffeeWithUnknownRecipe() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException, InsufficientAmountOfMoneyException, InventoryException, RecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        assertThrows(RecipeException.class, () -> CM.makeCoffee("Top", 50)); //cannot get change
+    }
+
+    @Test
+    public void testInvalidMakeCoffeeWithRecipeAndZeroAmount() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException, InsufficientAmountOfMoneyException, InventoryException, RecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        assertThrows(InsufficientAmountOfMoneyException.class, () -> CM.makeCoffee("Coffee", 0));
+    }
+
+    @Test
+    public void testInvalidMakeCoffeeWithRecipeAndMinIntegerValueAmount() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException, InsufficientAmountOfMoneyException, InventoryException, RecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        InvalidValueException exception = assertThrows(
+                InvalidValueException.class,
+                () -> CM.makeCoffee("Coffee", -1)
+        ); //cannot get change
+        assertEquals("Payment must be positive or less than 500 cents", exception.getMessage());
+    }
+
+    @Test
+    public void testInvalidMakeCoffeeWithRecipeAndMaxValueAmount() throws AmountOfRecipeException, DuplicatedRecipeException, InvalidValueException, InsufficientAmountOfMoneyException, InventoryException, RecipeException {
+        boolean ok = CM.addRecipe(r1);
+        assertTrue(ok);
+        assertThrows(InvalidValueException.class, () -> CM.makeCoffee("Coffee", Integer.MAX_VALUE)); //cannot get change and its above its capacity
+    }
 }
