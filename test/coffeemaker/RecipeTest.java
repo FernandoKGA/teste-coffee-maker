@@ -116,5 +116,8 @@ public class RecipeTest {
         assertEquals("Invalid name", thrown.getMessage());
     }
 
-
+    @Test
+    public void testInvalidRecipeInfiniteAmountOfIngredients() throws InvalidValueException {
+        assertThrows(InvalidValueException.class, () -> new Recipe("Coffee", 50, 4, 0, Integer.MAX_VALUE, 0));
+    }
 }
